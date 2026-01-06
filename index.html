@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Premium Blog Monitor | 네이버 블로그 실시간 모니터링</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" as="style" crossorigin
+        href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css" />
+</head>
+
+<body>
+    <div class="background-blobs">
+        <div class="blob blob-1"></div>
+        <div class="blob blob-2"></div>
+        <div class="blob blob-3"></div>
+    </div>
+
+    <div class="container">
+        <header>
+            <div class="logo">
+                <span class="gradient-text">Blog</span> Monitor
+            </div>
+            <p class="subtitle">네이버 블로그 최신 동향을 한눈에 파악하세요</p>
+        </header>
+
+        <section class="search-section card">
+            <h2>관심 키워드 선택</h2>
+            <div class="keywords-grid">
+                <label class="checkbox-container">
+                    <input type="checkbox" name="keyword" value="AI 기술">
+                    <span class="checkmark"></span>
+                    AI 기술
+                </label>
+                <label class="checkbox-container">
+                    <input type="checkbox" name="keyword" value="재테크">
+                    <span class="checkmark"></span>
+                    재테크
+                </label>
+                <label class="checkbox-container">
+                    <input type="checkbox" name="keyword" value="맛집">
+                    <span class="checkmark"></span>
+                    맛집
+                </label>
+                <label class="checkbox-container">
+                    <input type="checkbox" name="keyword" value="여행">
+                    <span class="checkmark"></span>
+                    여행
+                </label>
+                <label class="checkbox-container">
+                    <input type="checkbox" name="keyword" value="건강">
+                    <span class="checkmark"></span>
+                    건강
+                </label>
+                <label class="checkbox-container">
+                    <input type="checkbox" name="keyword" value="IT 기기">
+                    <span class="checkmark"></span>
+                    IT 기기
+                </label>
+            </div>
+
+            <div class="custom-keyword-container">
+                <input type="text" id="customKeyword" placeholder="추가 검색어 입력...">
+                <button type="button" id="addKeywordBtn" class="secondary-btn">추가</button>
+            </div>
+
+            <button id="searchBtn" class="primary-btn">
+                <span class="btn-text">검색 시작</span>
+                <span class="loader hidden"></span>
+            </button>
+        </section>
+
+        <section class="results-section">
+            <div class="results-header">
+                <span id="resultsCount">검색된 블로그 0건</span>
+                <div class="filter-badge">중복 제거 완료</div>
+            </div>
+            <div id="resultsList" class="results-grid">
+                <!-- 결과가 여기에 동적으로 추가됩니다 -->
+                <div class="empty-state">
+                    <p>키워드를 선택하고 검색 버튼을 눌러주세요.</p>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+
+</html>
