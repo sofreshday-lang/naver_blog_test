@@ -151,6 +151,8 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function renderResults(blogs, updateCount = true) {
+        resultsList.innerHTML = ''; // 기존 리스트를 비워줌 (필터링 즉시 반영을 위함)
+
         if (updateCount) {
             resultsCount.textContent = `검색된 블로그 ${blogs.length}건`;
         } else {
