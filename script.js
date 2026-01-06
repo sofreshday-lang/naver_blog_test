@@ -14,26 +14,53 @@ document.addEventListener('DOMContentLoaded', () => {
     // 필터 칩 클릭 이벤트
     filterChips.forEach(chip => {
         chip.addEventListener('click', () => {
-            // 활성 상태 변경
-            filterChips.forEach(c => c.classList.remove('active'));
-            chip.classList.add('active');
-
             const filter = chip.getAttribute('data-filter');
-            filterResults(filter);
+
+            if (filter === 'all') {
+                // '전체' 클릭 시 다른 모든 필터 해제
+                filterChips.forEach(c => c.classList.remove('active'));
+                chip.classList.add('active');
+            } else {
+                // 다른 필터 클릭 시 '전체' 해제 및 토글
+                document.querySelector('.filter-chip[data-filter="all"]').classList.remove('active');
+                chip.classList.toggle('active');
+
+                // 만약 모든 필터가 해제되었다면 '전체' 활성화
+                const activeFilters = document.querySelectorAll('.filter-chip.active:not([data-filter="all"])');
+                if (activeFilters.length === 0) {
+                    document.querySelector('.filter-chip[data-filter="all"]').classList.add('active');
+                }
+            }
+
+            applyFilters();
         });
     });
 
-    function filterResults(filter) {
-        let filtered;
-        if (filter === 'all') {
-            filtered = allBlogs;
-        } else if (filter === 'naedon') {
-            filtered = allBlogs.filter(blog => blog.is_naedon);
-        } else {
-            // positive, negative, neutral 필터
-            filtered = allBlogs.filter(blog => blog.sentiment === filter);
+    function applyFilters() {
+        const activeChips = Array.from(document.querySelectorAll('.filter-chip.active'))
+            .map(c => c.getAttribute('data-filter'));
+
+        if (activeChips.includes('all')) {
+            renderResults(allBlogs, false);
+            return;
         }
-        renderResults(filtered, false); // 필터링 시에는 스크롤 초기화 등을 고려해 false 전달 가능
+
+        const activeSentiments = activeChips.filter(f => ['positive', 'neutral', 'negative'].includes(f));
+        const isNaedonFilterActive = activeChips.includes('naedon');
+
+        let filtered = allBlogs;
+
+        // 1. 감성 필터 적용 (선택된 감성 중 하나라도 해당하면 통과 - OR)
+        if (activeSentiments.length > 0) {
+            filtered = filtered.filter(blog => activeSentiments.includes(blog.sentiment));
+        }
+
+        // 2. 내돈내산 필터 적용 (선택되어 있다면 반드시 내돈내산이어야 함 - AND)
+        if (isNaedonFilterActive) {
+            filtered = filtered.filter(blog => blog.is_naedon);
+        }
+
+        renderResults(filtered, false);
     }
 
     // 커스텀 키워드 추가 기능
@@ -132,7 +159,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         if (blogs.length === 0) {
-            resultsList.innerHTML = '<div class="empty-state">검색 결과가 없습니다.</div>';
+            // '검색 결과가 없습니다' 영역을 없애달라는 요청에 따라 메시지 출력 생략
             return;
         }
 
