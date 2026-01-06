@@ -21,6 +21,7 @@ class handler(BaseHTTPRequestHandler):
         # 쿼리 파라미터 파싱
         query_components = parse_qs(urlparse(self.path).query)
         keywords = query_components.get("keywords", [])
+        mode = query_components.get("mode", ["or"])[0]
         
         if not keywords:
             self.send_response(400)
@@ -30,7 +31,7 @@ class handler(BaseHTTPRequestHandler):
             return
 
         all_results = []
-        # 각 키워드별로 검색 수행 (기본 50개씩 조회)
+        # 각 키워드별로 검색 수행
         for keyword in keywords:
             url = f"https://openapi.naver.com/v1/search/blog.json?query={requests.utils.quote(keyword)}&display=50&sort=sim"
             headers = {
@@ -49,28 +50,37 @@ class handler(BaseHTTPRequestHandler):
             except Exception as e:
                 print(f"Error fetching keyword {keyword}: {e}")
 
-        # 중복 제거 (제목 또는 URL 기준, 최신 데이터 우선)
-        # 네이버 블로그 검색 결과는 기본적으로 신뢰도가 높은 순이지만, 
-        # 발행일 정렬을 위해 먼저 수집 후 처리
+        # 중복 제거 (URL 기준)
         unique_results = {}
         for item in all_results:
-            # HTML 태그 제거된 제목을 키로 사용하거나 URL을 키로 사용
-            clean_title = item['title'].replace("<b>", "").replace("</b>", "").strip()
-            link = item['link']
-            
-            # 고유 키 생성 (URL이 가장 정확함)
-            key = link
-            
-            # 이미 존재하면 발행일 비교 (더 최신이면 교체)
+            key = item['link']
             if key in unique_results:
-                existing_date = unique_results[key]['postdate']
-                if item['postdate'] > existing_date:
+                if item['postdate'] > unique_results[key]['postdate']:
                     unique_results[key] = item
             else:
                 unique_results[key] = item
 
-        # 리스트로 변환 및 발행일 최신순 정렬
         final_list = list(unique_results.values())
+
+        # AND 조건 필터링
+        if mode == "and" and len(keywords) > 1:
+            filtered_list = []
+            for item in final_list:
+                # 제목과 설명에서 태그 제거하고 비교
+                text_to_search = (item['title'] + " " + item['description']).replace("<b>", "").replace("</b>", "").lower()
+                
+                # 모든 키워드가 포함되어 있는지 확인
+                all_match = True
+                for kw in keywords:
+                    if kw.lower() not in text_to_search:
+                        all_match = False
+                        break
+                
+                if all_match:
+                    filtered_list.append(item)
+            final_list = filtered_list
+
+        # 발행일 최신순 정렬
         final_list.sort(key=lambda x: x['postdate'], reverse=True)
 
         self.send_response(200)

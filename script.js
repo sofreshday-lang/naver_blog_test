@@ -12,15 +12,25 @@ document.addEventListener('DOMContentLoaded', () => {
     addKeywordBtn.addEventListener('click', () => {
         const value = customKeywordInput.value.trim();
         if (value) {
-            const label = document.createElement('label');
-            label.className = 'checkbox-container';
-            label.innerHTML = `
-                <input type="checkbox" name="keyword" value="${value}" checked>
-                <span class="checkmark"></span>
-                ${value}
+            const item = document.createElement('div');
+            item.className = 'keyword-item';
+            item.innerHTML = `
+                <label class="checkbox-container">
+                    <input type="checkbox" name="keyword" value="${value}" checked>
+                    <span class="checkmark"></span>
+                    ${value}
+                </label>
+                <button class="delete-keyword">×</button>
             `;
-            keywordsGrid.appendChild(label);
+            keywordsGrid.appendChild(item);
             customKeywordInput.value = '';
+        }
+    });
+
+    // 키워드 삭제 기능 (이벤트 위임)
+    keywordsGrid.addEventListener('click', (e) => {
+        if (e.target.classList.contains('delete-keyword')) {
+            e.target.closest('.keyword-item').remove();
         }
     });
 
@@ -34,6 +44,8 @@ document.addEventListener('DOMContentLoaded', () => {
         const selectedKeywords = Array.from(document.querySelectorAll('input[name="keyword"]:checked'))
             .map(cb => cb.value);
 
+        const searchMode = document.querySelector('input[name="searchMode"]:checked').value;
+
         if (selectedKeywords.length === 0) {
             alert('최소 하나 이상의 키워드를 선택해주세요.');
             return;
@@ -44,9 +56,9 @@ document.addEventListener('DOMContentLoaded', () => {
         resultsList.innerHTML = '';
 
         try {
-            // 키워드를 쿼리 스트링으로 변환
+            // 키워드와 모드를 쿼리 스트링으로 변환
             const queryParams = selectedKeywords.map(k => `keywords=${encodeURIComponent(k)}`).join('&');
-            const response = await fetch(`/api/blog?${queryParams}`);
+            const response = await fetch(`/api/blog?${queryParams}&mode=${searchMode}`);
 
             if (!response.ok) throw new Error('데이터를 가져오는데 실패했습니다.');
 
