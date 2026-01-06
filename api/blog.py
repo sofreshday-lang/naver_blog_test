@@ -31,24 +31,42 @@ class handler(BaseHTTPRequestHandler):
             return
 
         all_results = []
-        # 각 키워드별로 검색 수행
-        for keyword in keywords:
-            url = f"https://openapi.naver.com/v1/search/blog.json?query={requests.utils.quote(keyword)}&display=50&sort=sim"
+        
+        # 검색 수행 로직 개선
+        if mode == "and" and len(keywords) > 1:
+            # AND 모드: 모든 키워드를 공백으로 합쳐서 한 번에 검색 (네이버 API 자체 AND 검색 활용)
+            combined_query = " ".join(keywords)
+            url = f"https://openapi.naver.com/v1/search/blog.json?query={requests.utils.quote(combined_query)}&display=100&sort=sim"
             headers = {
                 "X-Naver-Client-Id": CLIENT_ID,
                 "X-Naver-Client-Secret": CLIENT_SECRET
             }
-            
             try:
                 response = requests.get(url, headers=headers)
                 if response.status_code == 200:
                     items = response.json().get("items", [])
-                    # 키워드 정보 추가
                     for item in items:
-                        item['search_keyword'] = keyword
+                        item['search_keyword'] = "결합 검색"
                     all_results.extend(items)
             except Exception as e:
-                print(f"Error fetching keyword {keyword}: {e}")
+                print(f"Error fetching combined query: {e}")
+        else:
+            # OR 모드 또는 키워드가 하나인 경우: 기존처럼 개별 검색
+            for keyword in keywords:
+                url = f"https://openapi.naver.com/v1/search/blog.json?query={requests.utils.quote(keyword)}&display=50&sort=sim"
+                headers = {
+                    "X-Naver-Client-Id": CLIENT_ID,
+                    "X-Naver-Client-Secret": CLIENT_SECRET
+                }
+                try:
+                    response = requests.get(url, headers=headers)
+                    if response.status_code == 200:
+                        items = response.json().get("items", [])
+                        for item in items:
+                            item['search_keyword'] = keyword
+                        all_results.extend(items)
+                except Exception as e:
+                    print(f"Error fetching keyword {keyword}: {e}")
 
         # 중복 제거 (URL 기준)
         unique_results = {}
