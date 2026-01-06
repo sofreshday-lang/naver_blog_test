@@ -83,6 +83,29 @@ class handler(BaseHTTPRequestHandler):
         # 발행일 최신순 정렬
         final_list.sort(key=lambda x: x['postdate'], reverse=True)
 
+        # 감성 분석 및 내돈내산 태깅 로직 추가
+        pos_words = ['추천', '좋아요', '최고', '만족', '맛집', '친절', '깔끔', '대박', '성공', '꿀팁']
+        neg_words = ['비추', '실망', '아쉬워', '별로', '최악', '불친절', '비싸', '냄새', '더럽', '다신']
+
+        for item in final_list:
+            desc = item['description'].replace("<b>", "").replace("</b>", "")
+            title = item['title'].replace("<b>", "").replace("</b>", "")
+            full_text = title + " " + desc
+
+            # 내돈내산 여부
+            item['is_naedon'] = '내돈내산' in full_text
+
+            # 감성 분석 (단어 빈도 기반)
+            pos_score = sum(1 for word in pos_words if word in full_text)
+            neg_score = sum(1 for word in neg_words if word in full_text)
+
+            if pos_score > neg_score:
+                item['sentiment'] = 'positive'
+            elif neg_score > pos_score:
+                item['sentiment'] = 'negative'
+            else:
+                item['sentiment'] = 'neutral'
+
         self.send_response(200)
         self.send_header('Content-type', 'application/json')
         self.send_header('Access-Control-Allow-Origin', '*')

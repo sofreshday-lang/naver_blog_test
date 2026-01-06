@@ -393,6 +393,45 @@ input[type="text"]:focus {
     background: rgba(255, 255, 255, 0.08);
 }
 
+/* Analysis Tags Styling */
+.analysis-bar {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 12px;
+}
+
+.tag {
+    font-size: 0.75rem;
+    font-weight: 800;
+    padding: 3px 10px;
+    border-radius: 6px;
+    text-transform: uppercase;
+}
+
+.tag-positive {
+    background: rgba(94, 255, 188, 0.15);
+    color: #5effbc;
+    border: 1px solid rgba(94, 255, 188, 0.3);
+}
+
+.tag-negative {
+    background: rgba(255, 77, 77, 0.15);
+    color: #ff4d4d;
+    border: 1px solid rgba(255, 77, 77, 0.3);
+}
+
+.tag-neutral {
+    background: rgba(255, 255, 255, 0.05);
+    color: #a0a0a0;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.tag-naedon {
+    background: linear-gradient(90deg, #fceabb, #f8b500);
+    color: #000;
+    box-shadow: 0 2px 8px rgba(248, 181, 0, 0.3);
+}
+
 .blog-card h3 {
     font-size: 1.25rem;
     margin-bottom: 12px;

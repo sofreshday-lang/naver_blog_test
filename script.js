@@ -102,7 +102,16 @@ document.addEventListener('DOMContentLoaded', () => {
             card.className = 'blog-card';
             card.style.animationDelay = `${index * 0.05}s`;
 
+            // 분석 태그 생성
+            let analysisTags = `<span class="tag tag-${blog.sentiment}">${blog.sentiment.toUpperCase()}</span>`;
+            if (blog.is_naedon) {
+                analysisTags += `<span class="tag tag-naedon">내돈내산</span>`;
+            }
+
             card.innerHTML = `
+                <div class="analysis-bar">
+                    ${analysisTags}
+                </div>
                 <div class="blog-meta">
                     <span class="blogger">@${blog.bloggername}</span>
                     <span class="date">${formatDate(blog.postdate)}</span>
