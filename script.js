@@ -7,6 +7,34 @@ document.addEventListener('DOMContentLoaded', () => {
     const resultsCount = document.getElementById('resultsCount');
     const loader = document.querySelector('.loader');
     const btnText = document.querySelector('.btn-text');
+    const filterChips = document.querySelectorAll('.filter-chip');
+
+    let allBlogs = []; // 검색된 전체 데이터를 저장할 변수
+
+    // 필터 칩 클릭 이벤트
+    filterChips.forEach(chip => {
+        chip.addEventListener('click', () => {
+            // 활성 상태 변경
+            filterChips.forEach(c => c.classList.remove('active'));
+            chip.classList.add('active');
+
+            const filter = chip.getAttribute('data-filter');
+            filterResults(filter);
+        });
+    });
+
+    function filterResults(filter) {
+        let filtered;
+        if (filter === 'all') {
+            filtered = allBlogs;
+        } else if (filter === 'naedon') {
+            filtered = allBlogs.filter(blog => blog.is_naedon);
+        } else {
+            // positive, negative, neutral 필터
+            filtered = allBlogs.filter(blog => blog.sentiment === filter);
+        }
+        renderResults(filtered, false); // 필터링 시에는 스크롤 초기화 등을 고려해 false 전달 가능
+    }
 
     // 커스텀 키워드 추가 기능
     addKeywordBtn.addEventListener('click', () => {
@@ -63,7 +91,13 @@ document.addEventListener('DOMContentLoaded', () => {
             if (!response.ok) throw new Error('데이터를 가져오는데 실패했습니다.');
 
             const data = await response.json();
-            renderResults(data);
+            allBlogs = data; // 결과 저장
+
+            // 필터 초기화 (전체 선택 상태로)
+            filterChips.forEach(c => c.classList.remove('active'));
+            document.querySelector('.filter-chip[data-filter="all"]').classList.add('active');
+
+            renderResults(allBlogs);
         } catch (error) {
             console.error(error);
             resultsList.innerHTML = `<div class="empty-state">오류가 발생했습니다: ${error.message}</div>`;
@@ -89,8 +123,13 @@ document.addEventListener('DOMContentLoaded', () => {
         return `${dateStr.substring(0, 4)}.${dateStr.substring(4, 6)}.${dateStr.substring(6, 8)}`;
     }
 
-    function renderResults(blogs) {
-        resultsCount.textContent = `검색된 블로그 ${blogs.length}건`;
+    function renderResults(blogs, updateCount = true) {
+        if (updateCount) {
+            resultsCount.textContent = `검색된 블로그 ${blogs.length}건`;
+        } else {
+            // 필터링된 결과 개수 표시 (선택 사항)
+            resultsCount.innerHTML = `검색된 블로그 ${allBlogs.length}건 <span style="font-size:0.8rem; color:var(--text-dim);">(필터링됨: ${blogs.length}건)</span>`;
+        }
 
         if (blogs.length === 0) {
             resultsList.innerHTML = '<div class="empty-state">검색 결과가 없습니다.</div>';

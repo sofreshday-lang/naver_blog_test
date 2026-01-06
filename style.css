@@ -360,6 +360,62 @@ input[type="text"]:focus {
     border-radius: 20px;
 }
 
+.filter-tags-container {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 25px;
+    flex-wrap: wrap;
+}
+
+.filter-chip {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid var(--border-color);
+    color: var(--text-dim);
+    padding: 8px 16px;
+    border-radius: 30px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.filter-chip:hover {
+    background: rgba(255, 255, 255, 0.1);
+    border-color: var(--text-dim);
+    transform: translateY(-2px);
+}
+
+.filter-chip.active {
+    background: white;
+    color: black;
+    border-color: white;
+    box-shadow: 0 4px 15px rgba(255, 255, 255, 0.2);
+}
+
+.filter-chip.active[data-filter="positive"] {
+    background: #5effbc;
+    color: #000;
+    border-color: #5effbc;
+}
+
+.filter-chip.active[data-filter="negative"] {
+    background: #ff4d4d;
+    color: #fff;
+    border-color: #ff4d4d;
+}
+
+.filter-chip.active[data-filter="neutral"] {
+    background: #a0a0a0;
+    color: #000;
+    border-color: #a0a0a0;
+}
+
+.filter-chip.active[data-filter="naedon"] {
+    background: #f8b500;
+    color: #000;
+    border-color: #f8b500;
+}
+
 .results-grid {
     display: grid;
     grid-template-columns: 1fr;
